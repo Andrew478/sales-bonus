@@ -6,6 +6,7 @@
  */
 function calculateSimpleRevenue(purchase, _product) {
    // @TODO: Расчет выручки от операции
+   const { discount, sale_price, quantity } = purchase;
 }
 
 /**
@@ -17,6 +18,7 @@ function calculateSimpleRevenue(purchase, _product) {
  */
 function calculateBonusByProfit(index, total, seller) {
     // @TODO: Расчет бонуса от позиции в рейтинге
+    const { profit } = seller;
 }
 
 /**
@@ -27,6 +29,17 @@ function calculateBonusByProfit(index, total, seller) {
  */
 function analyzeSalesData(data, options) {
     // @TODO: Проверка входных данных
+    const { calculateRevenue, calculateBonus } = options;
+    
+    //Проверка входных данных
+    // 1. data это не объект, а что-то ещё, может какой-нибудь undefined, null случайно пришёл.
+    // Так-то объект это truthy тип, поэтому "!data" только на undefined и null проверит.
+    // 2. внутри data для работы функции должен быть массив продавцов. Если это не массив, то error.
+    // 3. То же место проверяем, что и в пункте 2. Только теперь отсекаем пустой массив, такой нам тоже не нужен.
+    if(!data
+        || !Array.isArray(data.sellers)
+        || data.sellers.length === 0
+    ) throw new Error('Некорректные входные данные');
 
     // @TODO: Проверка наличия опций
 
