@@ -43,7 +43,9 @@ function analyzeSalesData(data, options) {
     ) throw new Error('Некорректные входные данные');
 
     // @TODO: Проверка наличия опций
-    if(!calculateRevenue || !calculateBonus) throw new Error('Отсутствуют функции обработки.');
+    if((!calculateRevenue || !calculateBonus)
+    || (!(typeof calculateRevenue === 'function') || !(typeof calculateBonus === 'function'))
+    ) throw new Error('Отсутствуют функции обработки.');
 
     // @TODO: Подготовка промежуточных данных для сбора статистики
 
