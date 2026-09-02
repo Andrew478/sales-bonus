@@ -32,16 +32,18 @@ function analyzeSalesData(data, options) {
     const { calculateRevenue, calculateBonus } = options;
     
     //Проверка входных данных
-    // 1. data это не объект, а что-то ещё, может какой-нибудь undefined, null случайно пришёл.
+    // 1. data это объект, а не что-то ещё, может какой-нибудь undefined, null случайно пришёл.
     // Так-то объект это truthy тип, поэтому "!data" только на undefined и null проверит.
     // 2. внутри data для работы функции должен быть массив продавцов. Если это не массив, то error.
+    // Помимо продавцов остальные ключи тоже должны быть массивами.
     // 3. То же место проверяем, что и в пункте 2. Только теперь отсекаем пустой массив, такой нам тоже не нужен.
     if(!data
-        || !Array.isArray(data.sellers)
-        || data.sellers.length === 0
+        || (!Array.isArray(data.sellers) || !Array.isArray(data.purchase_records) || !Array.isArray(data.products) || !Array.isArray(data.customers))
+        || (data.sellers.length === 0 || data.purchase_records.length === 0 || data.products.length === 0 || data.customers.length === 0)
     ) throw new Error('Некорректные входные данные');
 
     // @TODO: Проверка наличия опций
+    if(!calculateRevenue || !calculateBonus) throw new Error('Отсутствуют функции обработки.');
 
     // @TODO: Подготовка промежуточных данных для сбора статистики
 
@@ -54,4 +56,5 @@ function analyzeSalesData(data, options) {
     // @TODO: Назначение премий на основе ранжирования
 
     // @TODO: Подготовка итоговой коллекции с нужными полями
+    // То, что вернётся это объект. Он описан какие должны быть ключи в начале функции.
 }
