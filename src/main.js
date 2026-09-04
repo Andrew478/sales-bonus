@@ -28,7 +28,7 @@ function calculateBonusByProfit(index, total, seller) {
  * @returns {{revenue, top_products, bonus, name, sales_count, profit, seller_id}[]}
  */
 function analyzeSalesData(data, options) {
-    // @TODO: Проверка входных данных
+    // Распаковка функций
     const { calculateRevenue, calculateBonus } = options;
     
     //Проверка входных данных
@@ -42,14 +42,41 @@ function analyzeSalesData(data, options) {
         || (data.sellers.length === 0 || data.purchase_records.length === 0 || data.products.length === 0 || data.customers.length === 0)
     ) throw new Error('Некорректные входные данные');
 
-    // @TODO: Проверка наличия опций
+    // Проверка наличия требуемых функций в опциях
     if((!calculateRevenue || !calculateBonus)
     || (!(typeof calculateRevenue === 'function') || !(typeof calculateBonus === 'function'))
     ) throw new Error('Отсутствуют функции обработки.');
 
     // @TODO: Подготовка промежуточных данных для сбора статистики
+    let sellerStats = data.sellers.map(seller => {
+        // создаём новый объект
+        return {
+            id: seller.id,
+            name: `${seller.first_name} ${seller.last_name}`,
+            revenue: 0,
+            profit: 0,
+            sales_count: 0,
+            products_sold: {}
+        }
+    });
+    console.log(`Сделали sellerStats`);
+    console.table(sellerStats);
 
     // @TODO: Индексация продавцов и товаров для быстрого доступа
+
+    let sellerIndex = data.sellers.reduce((result, seller) => {
+        result[seller.id] = seller;
+        return result;
+    }, {});
+    console.log(`Вывожу sellerIndex:`);
+    console.table(sellerIndex);
+
+    let productIndex = data.products.reduce((result, product) => {
+        result[product.sku] = product;
+        return result;
+    }, {});
+    console.log(`Вывожу productIndex:`);
+    console.table(productIndex);
 
     // @TODO: Расчет выручки и прибыли для каждого продавца
 
