@@ -7,6 +7,7 @@
 function calculateSimpleRevenue(purchase, _product) {
    // @TODO: Расчет выручки от операции
    const { discount, sale_price, quantity } = purchase;
+   return sale_price * quantity - discount * quantity;
 }
 
 /**
@@ -64,7 +65,7 @@ function analyzeSalesData(data, options) {
 
     // @TODO: Индексация продавцов и товаров для быстрого доступа
 
-    let sellerIndex = data.sellers.reduce((result, seller) => {
+    let sellerIndex = sellerStats.reduce((result, seller) => {
         result[seller.id] = seller;
         return result;
     }, {});
@@ -80,6 +81,29 @@ function analyzeSalesData(data, options) {
 
     // @TODO: Расчет выручки и прибыли для каждого продавца
     // Вот тут видимо надо попотеть.
+    for(let purchase_record of data.purchase_records) {
+        // Шаг 1. Получили ссылку на продавца в итоговом отчёте
+        let seller = sellerIndex[purchase_record.seller_id];
+
+        // Далее: наполняем его объект данными с продажи
+        seller.sales_count++; // Увеличили количество продаж на одну текущую
+
+        for(let record_item of purchase_record.items) {
+            let productFromDatabase = productIndex[record_item.sku]; // отсюда мы возьмём инфу о себестоимости
+            let costPrice = productFromDatabase.purchase_price * record_item.quantity; // Считаем себестоимость: себестоимость * количество проданных в чеке
+            
+            let revenue = calculateRevenue(record_item);  // Считаем выручку revenue. Второй параметр для calculateRevenue не передаём (намёк в аргументе нижний прочерк)
+            seller.revenue += revenue;
+            
+            let profit = revenue - costPrice; // Считаем профит
+            seller.profit += profit;
+
+            // Осталось вести учёт количества проданных товаров (группировка по признаку)
+            if(!seller.products_sold[record_item.sku]) seller.products_sold[record_item.sku] = 0;
+            seller.products_sold[record_item.sku] += record_item.quantity;
+        }
+
+    }
     
     // @TODO: Сортировка продавцов по прибыли
     // Тут применяем просто sort()
