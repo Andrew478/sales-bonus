@@ -6,8 +6,9 @@
  */
 function calculateSimpleRevenue(purchase, _product) {
    // @TODO: Расчет выручки от операции
-   const { discount, sale_price, quantity } = purchase;
-   return sale_price * quantity - discount * quantity;
+   let { discount, sale_price, quantity } = purchase;
+   discount = 1 - (discount / 100); // Эта формула дана в тексте задания, discount изначально процент, превращаем в коэффициент
+   return sale_price * quantity * discount;
 }
 
 /**
@@ -19,7 +20,23 @@ function calculateSimpleRevenue(purchase, _product) {
  */
 function calculateBonusByProfit(index, total, seller) {
     // @TODO: Расчет бонуса от позиции в рейтинге
-    const { profit } = seller;
+    let { profit } = seller;
+    let bonus = 1;
+
+    if(index === 0) {
+        bonus = profit * 0.15;
+    }
+    else if(index === 1 || index === 2) {
+        bonus = profit * 0.1;
+    }
+    else if(index === (total - 1)) {
+        bonus = 0;
+    }
+    else { // Все остальные
+        bonus = profit * 0.05;
+    }
+
+    return bonus;
 }
 
 /**
@@ -107,11 +124,57 @@ function analyzeSalesData(data, options) {
     
     // @TODO: Сортировка продавцов по прибыли
     // Тут применяем просто sort()
+    sellerStats.sort(sortFnSellers);
+
+    function sortFnSellers(a, b) {
+        if(a.profit < b.profit) return 1;
+        else if(a.profit > b.profit) return -1;
+        else return 0;
+    }
+    console.log(`\nОтсортировали sellerStats после заполнения. Результат:`);
+    console.table(sellerStats);
 
     // @TODO: Назначение премий на основе ранжирования
     // Смотрим в текст задания, там указаны значения премий за каждое место
+    
+    // Считаем бонус
+    sellerStats = sellerStats.map((seller, index, arr) => {
+        seller.bonus = calculateBonusByProfit(index, arr.length, seller);
+
+        // Теперь считаем топ-10 продуктов
+        let top_prod = Object.entries(seller.products_sold);
+        top_prod = top_prod.map(value => {
+            return { [value[0]]: value[1] }
+        });
+
+        top_prod.sort( (a, b) => {
+            if(Object.values(a)[0] < Object.values(b)[0] ) return 1;
+            else if(Object.values(a)[0] > Object.values(b)[0] ) return -1;
+            else return 0;
+        });
+
+        top_prod = top_prod.slice(0, 10); // берём топ-10 первые
+
+        seller.top_products = top_prod;
+
+        return seller;
+    });
+
+    console.log(`\nДобавили значение бонуса для продавца`);
+    console.table(sellerStats);
+
+    
 
     // @TODO: Подготовка итоговой коллекции с нужными полями
+
+    // sellerStats по сравнению со стартом претерпит изменения в полях
+    // products_sold должен быть убран, на его место встанет то-10 проданных продуктов top_products
+    // добавится поле bonus
+    sellerStats = sellerStats.map(seller => {
+        delete seller.products_sold;
+        return seller;
+    });
+
     return sellerStats;
     // То, что вернётся это массив sellerStats, только поля уже буду заполнены посчитанными данными.
 }
