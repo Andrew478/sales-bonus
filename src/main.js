@@ -169,7 +169,7 @@ function analyzeSalesData(data, options) {
         seller.top_products = seller.top_products.map(prod => {
             return {
                 sku: Object.keys(prod)[0],
-                quantiny: Object.values(prod)[0]
+                quantity: Object.values(prod)[0]
             }
         });
 
