@@ -69,7 +69,7 @@ function analyzeSalesData(data, options) {
     let sellerStats = data.sellers.map(seller => {
         // создаём новый объект
         return {
-            id: seller.id,
+            seller_id: seller.id,
             name: `${seller.first_name} ${seller.last_name}`,
             revenue: 0,
             profit: 0,
@@ -77,24 +77,18 @@ function analyzeSalesData(data, options) {
             products_sold: {}
         }
     });
-    console.log(`Сделали sellerStats`);
-    console.table(sellerStats);
 
     // @TODO: Индексация продавцов и товаров для быстрого доступа
 
     let sellerIndex = sellerStats.reduce((result, seller) => {
-        result[seller.id] = seller;
+        result[seller.seller_id] = seller;
         return result;
     }, {});
-    console.log(`Вывожу sellerIndex:`);
-    console.table(sellerIndex);
 
     let productIndex = data.products.reduce((result, product) => {
         result[product.sku] = product;
         return result;
     }, {});
-    console.log(`Вывожу productIndex:`);
-    console.table(productIndex);
 
     // @TODO: Расчет выручки и прибыли для каждого продавца
     // Вот тут видимо надо попотеть.
@@ -131,8 +125,6 @@ function analyzeSalesData(data, options) {
         else if(a.profit > b.profit) return -1;
         else return 0;
     }
-    console.log(`\nОтсортировали sellerStats после заполнения. Результат:`);
-    console.table(sellerStats);
 
     // @TODO: Назначение премий на основе ранжирования
     // Смотрим в текст задания, там указаны значения премий за каждое место
@@ -160,18 +152,27 @@ function analyzeSalesData(data, options) {
         return seller;
     });
 
-    console.log(`\nДобавили значение бонуса для продавца`);
-    console.table(sellerStats);
-
     
 
     // @TODO: Подготовка итоговой коллекции с нужными полями
 
     // sellerStats по сравнению со стартом претерпит изменения в полях
     // products_sold должен быть убран, на его место встанет то-10 проданных продуктов top_products
-    // добавится поле bonus
     sellerStats = sellerStats.map(seller => {
         delete seller.products_sold;
+        // Приводим в порядок дробные значения
+        seller.revenue = +seller.revenue.toFixed(2);
+        seller.profit = +seller.profit.toFixed(2);
+        seller.bonus = +seller.bonus.toFixed(2);
+
+        // Приводим в порядок массив из топ-10 продуктов
+        seller.top_products = seller.top_products.map(prod => {
+            return {
+                sku: Object.keys(prod)[0],
+                quantiny: Object.values(prod)[0]
+            }
+        });
+
         return seller;
     });
 
