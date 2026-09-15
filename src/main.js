@@ -8,7 +8,7 @@ function calculateSimpleRevenue(purchase, _product) {
    // @TODO: Расчет выручки от операции
    let { discount, sale_price, quantity } = purchase;
    discount = 1 - (discount / 100); // Эта формула дана в тексте задания, discount изначально процент, превращаем в коэффициент
-   return sale_price * quantity * discount;
+   return +(sale_price * quantity * discount).toFixed(2);
 }
 
 /**
@@ -101,7 +101,7 @@ function analyzeSalesData(data, options) {
 
         for(let record_item of purchase_record.items) {
             let productFromDatabase = productIndex[record_item.sku]; // отсюда мы возьмём инфу о себестоимости
-            let costPrice = +productFromDatabase.purchase_price.toFixed(2) * record_item.quantity; // Считаем себестоимость: себестоимость * количество проданных в чеке
+            let costPrice = +(productFromDatabase.purchase_price * record_item.quantity).toFixed(2); // Считаем себестоимость: себестоимость * количество проданных в чеке
             
             let revenue = calculateRevenue(record_item);  // Считаем выручку revenue. Второй параметр для calculateRevenue не передаём (намёк в аргументе нижний прочерк)
             seller.revenue += +revenue.toFixed(2); // было seller.revenue += revenue, но надо пройти через магию дробных чисел в тестах
