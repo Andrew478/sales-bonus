@@ -8,7 +8,7 @@ function calculateSimpleRevenue(purchase, _product) {
    // @TODO: Расчет выручки от операции
    let { discount, sale_price, quantity } = purchase;
    discount = 1 - (discount / 100); // Эта формула дана в тексте задания, discount изначально процент, превращаем в коэффициент
-   return +(sale_price * quantity * discount).toFixed(2);
+   return +(+sale_price.toFixed(2) * quantity * discount.toFixed(2)).toFixed(2);
 }
 
 /**
